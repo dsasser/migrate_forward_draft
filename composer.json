@@ -3,6 +3,12 @@
   "description": "Migrate destination plugin that preserves forward draft revisions on migration reruns.",
   "type": "drupal-module",
   "license": "GPL-2.0-or-later",
+  "authors": [
+    {
+      "name": "Daniel Sasser",
+      "email": "221539+dsasser@users.noreply.github.com"
+    }
+  ],
   "require": {
     "drupal/core": "^10 || ^11"
   }
