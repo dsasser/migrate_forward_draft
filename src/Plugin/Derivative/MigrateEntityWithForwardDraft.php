@@ -25,14 +25,14 @@ class MigrateEntityWithForwardDraft implements ContainerDeriverInterface {
   /**
    * Entity type definitions.
    *
-   * @var \Drupal\Core\Entity\EntityTypeInterface[]
+   * @var EntityTypeInterface[]
    */
   protected array $entityDefinitions;
 
   /**
    * Constructs a MigrateEntityWithForwardDraft deriver.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface[] $entity_definitions
+   * @param EntityTypeInterface[] $entity_definitions
    *   Entity type plugin definitions from the entity type manager.
    */
   public function __construct(array $entity_definitions) {
@@ -42,7 +42,7 @@ class MigrateEntityWithForwardDraft implements ContainerDeriverInterface {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, $base_plugin_id) {
+  public static function create(ContainerInterface $container, $base_plugin_id): ContainerDeriverInterface|MigrateEntityWithForwardDraft|static {
     return new static(
       $container->get('entity_type.manager')->getDefinitions()
     );
@@ -78,9 +78,13 @@ class MigrateEntityWithForwardDraft implements ContainerDeriverInterface {
 
   /**
    * Whether the entity type can use the forward-draft destination.
+   *
+   * Revision support is determined with
+   * \Drupal\Core\Entity\EntityTypeInterface::isRevisionable(), not by treating
+   * the revision key name as a boolean.
    */
   protected static function isSupportedEntityType(EntityTypeInterface $entity_type): bool {
-    return (bool) $entity_type->getKey('revision')
+    return $entity_type->isRevisionable()
       && $entity_type->entityClassImplements(FieldableEntityInterface::class);
   }
 

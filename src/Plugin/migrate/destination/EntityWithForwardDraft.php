@@ -3,6 +3,9 @@
 namespace Drupal\migrate_forward_draft\Plugin\migrate\destination;
 
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Entity\RevisionableInterface;
+use Drupal\Core\Entity\RevisionLogInterface;
 use Drupal\migrate\Attribute\MigrateDestination;
 use Drupal\migrate\Plugin\migrate\destination\EntityContentBase;
 use Drupal\migrate\Row;
@@ -64,6 +67,8 @@ class EntityWithForwardDraft extends EntityContentBase {
 
   /**
    * {@inheritdoc}
+   *
+   * @throws \Drupal\Core\Entity\EntityStorageException
    */
   public function import(Row $row, array $old_destination_id_values = []) {
     $this->forwardDraft = $this->captureForwardDraft($old_destination_id_values);
@@ -86,7 +91,7 @@ class EntityWithForwardDraft extends EntityContentBase {
    * migration_sync (default TRUE) to decide whether setSyncing(TRUE) runs,
    * matching EntityContentBase when TRUE.
    */
-  protected function save(ContentEntityInterface $entity, array $old_destination_id_values = []) {
+  protected function save(ContentEntityInterface $entity, array $old_destination_id_values = []): array {
     if (!empty($old_destination_id_values)) {
       $entity->setNewRevision(TRUE);
       $entity->isDefaultRevision(TRUE);
@@ -102,27 +107,28 @@ class EntityWithForwardDraft extends EntityContentBase {
    * Captures the current forward draft revision if one exists.
    *
    * A forward draft is a non-default revision that is newer (higher revision
-   * ID) than the current default revision.
+   * ID) than the current default revision. The entity returned by storage
+   * load() must implement RevisionableInterface to read the default revision
+   * ID; otherwise this returns NULL.
    *
    * @param array $old_destination_id_values
    *   The old destination IDs from the migration ID map.
    *
-   * @return \Drupal\Core\Entity\ContentEntityInterface|null
+   * @return RevisionableInterface|null
    *   The forward draft entity, or NULL if none exists.
    */
-  protected function captureForwardDraft(array $old_destination_id_values): ?ContentEntityInterface {
+  protected function captureForwardDraft(array $old_destination_id_values): ?RevisionableInterface {
     if (empty($old_destination_id_values)) {
       return NULL;
     }
 
     $entity_id = reset($old_destination_id_values);
     $entity = $this->storage->load($entity_id);
-    if ($entity === NULL) {
+    if (!($entity instanceof RevisionableInterface)) {
       return NULL;
     }
-
     $default_revision_id = $entity->getRevisionId();
-    /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
+    /** @var RevisionableStorageInterface $storage */
     $storage = $this->storage;
     $latest_revision_id = $storage->getLatestRevisionId($entity_id);
 
@@ -131,7 +137,7 @@ class EntityWithForwardDraft extends EntityContentBase {
     }
 
     $latest_revision = $storage->loadRevision($latest_revision_id);
-    if ($latest_revision === NULL || $latest_revision->isDefaultRevision()) {
+    if (!($latest_revision instanceof RevisionableInterface) || $latest_revision->isDefaultRevision()) {
       return NULL;
     }
 
@@ -143,12 +149,16 @@ class EntityWithForwardDraft extends EntityContentBase {
    *
    * Does not call setSyncing() so content moderation can enforce non-default
    * state. Applies $overwrite_properties from the published revision when
-   * listed.
+   * listed. Overwrites use field APIs only when the loaded default revision is
+   * fieldable. A revision log message is set only when the draft implements
+   * \Drupal\Core\Entity\RevisionLogInterface (e.g. nodes, block content).
    *
    * @param int|string $entity_id
    *   The entity ID of the newly saved default revision.
    * @param array $overwrite_properties
    *   Destination field/property names to copy from the default revision.
+   *
+   * @throws \Drupal\Core\Entity\EntityStorageException
    */
   protected function replayForwardDraft(int|string $entity_id, array $overwrite_properties): void {
     $published = $this->storage->load($entity_id);
@@ -161,13 +171,17 @@ class EntityWithForwardDraft extends EntityContentBase {
     $draft->enforceIsNew(FALSE);
     $draft->isDefaultRevision(FALSE);
 
-    foreach ($overwrite_properties as $field_name) {
-      if ($published->hasField($field_name) && $draft->hasField($field_name)) {
-        $draft->set($field_name, $published->get($field_name)->getValue());
+    if ($published instanceof FieldableEntityInterface) {
+      foreach ($overwrite_properties as $field_name) {
+        if ($published->hasField($field_name) && $draft->hasField($field_name)) {
+          $draft->set($field_name, $published->get($field_name)->getValue());
+        }
       }
     }
 
-    $draft->setRevisionLogMessage('Draft revision carried forward after migration rerun.');
+    if ($draft instanceof RevisionLogInterface) {
+      $draft->setRevisionLogMessage('Draft revision carried forward after migration rerun.');
+    }
     $draft->save();
   }
 

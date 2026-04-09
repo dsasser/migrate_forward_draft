@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\migrate_forward_draft\Kernel;
 
+use Drupal\content_moderation\Plugin\WorkflowType\ContentModerationInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\migrate\MigrateExecutable;
@@ -44,6 +45,8 @@ class EntityWithForwardDraftTest extends MigrateTestBase {
 
   /**
    * {@inheritdoc}
+   *
+   * @throws \Drupal\Core\Entity\EntityStorageException
    */
   protected function setUp(): void {
     parent::setUp();
@@ -87,7 +90,9 @@ class EntityWithForwardDraftTest extends MigrateTestBase {
 
     // Set up editorial workflow for the product type.
     $workflow = $this->createEditorialWorkflow();
-    $workflow->getTypePlugin()->addEntityTypeAndBundle('node', 'product');
+    $type_plugin = $workflow->getTypePlugin();
+    $this->assertInstanceOf(ContentModerationInterface::class, $type_plugin);
+    $type_plugin->addEntityTypeAndBundle('node', 'product');
     $workflow->save();
   }
 
@@ -95,8 +100,7 @@ class EntityWithForwardDraftTest extends MigrateTestBase {
    * Creates a migration instance with the given source data rows.
    *
    * Uses migration YAML files from the module's migrations/ directory and
-   * overrides the embedded_data source rows at runtime. This mirrors the
-   * pattern used in va.gov-cms's Migrator helper.
+   * overrides the embedded_data source rows at runtime.
    *
    * @param string $migration_id
    *   A migration plugin ID from the module's migrations/ directory.
@@ -138,6 +142,8 @@ class EntityWithForwardDraftTest extends MigrateTestBase {
    *   The node ID.
    * @param string $notes_value
    *   The value to set on field_product_notes.
+   *
+   * @throws \Drupal\Core\Entity\EntityStorageException
    */
   protected function createForwardDraft(int $nid, string $notes_value): void {
     $node = Node::load($nid);
