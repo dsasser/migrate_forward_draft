@@ -1,0 +1,21 @@
+Migrate Forward Draft 8.x-1.0.x
+--------------------------------
+
+8.x-1.0.0 (unreleased)
+- Initial release on Drupal.org packaging track.
+- Destination plugin `entity_with_forward_draft` (per-entity derivatives, e.g.
+  `entity_with_forward_draft:node`) with optional
+  `forward_revision_overwrite_properties`. An empty list still replays a
+  forward draft without copying migration-owned fields from the published
+  revision onto the draft.
+- Optional `migration_sync` destination setting (default TRUE): when FALSE, the
+  main migration entity save does not call `setSyncing(TRUE)`, approximating
+  environments where moderation creates new revisions without the migrate sync
+  path. Replay of forward drafts never uses syncing.
+- Example migrations and content type live in the separate
+  `migrate_forward_draft_demo` module (enable optionally).
+
+Known follow-ups (not in this release)
+- Deeper parity with complex migrations (e.g. `published_status` pipeline keys,
+  entity_reference_revisions default values vs default revision) may need
+  additional documentation or tests.

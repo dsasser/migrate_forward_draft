@@ -1,0 +1,13 @@
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - migrate_forward_draft_demo
+  module:
+    - migrate_plus
+id: demo
+label: 'Migrate Forward Draft demo'
+description: 'Sample migrations comparing standard entity destination and forward-draft preservation.'
+module: migrate_forward_draft_demo
+source_type: ''

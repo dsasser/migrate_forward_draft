@@ -1,0 +1,23 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_product_notes
+    - node.type.product
+  enforced:
+    module:
+      - migrate_forward_draft_demo
+  module:
+    - text
+id: node.product.field_product_notes
+field_name: field_product_notes
+entity_type: node
+bundle: product
+label: Notes
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: text_long

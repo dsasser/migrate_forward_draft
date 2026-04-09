@@ -1,0 +1,7 @@
+name: 'Migrate Forward Draft'
+type: module
+description: 'Provides a migrate destination plugin that preserves forward draft revisions when a migration reruns over published content.'
+package: Migration
+core_version_requirement: ^10 || ^11
+dependencies:
+  - drupal:migrate

@@ -1,0 +1,9 @@
+{
+  "name": "drupal/migrate_forward_draft",
+  "description": "Migrate destination plugin that preserves forward draft revisions on migration reruns.",
+  "type": "drupal-module",
+  "license": "GPL-2.0-or-later",
+  "require": {
+    "drupal/core": "^10 || ^11"
+  }
+}

@@ -1,0 +1,15 @@
+name: 'Migrate Forward Draft Demo'
+type: module
+description: 'Optional demo migrations and sample product content type for migrate_forward_draft.'
+package: Migration
+core_version_requirement: ^10 || ^11
+dependencies:
+  - migrate_forward_draft:migrate_forward_draft
+  - drupal:migrate
+  - migrate_plus:migrate_plus
+  - drupal:node
+  - drupal:menu_ui
+  - drupal:field
+  - drupal:text
+  - drupal:workflows
+  - drupal:content_moderation

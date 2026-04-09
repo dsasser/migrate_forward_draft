@@ -1,0 +1,58 @@
+id: demo_product
+status: true
+label: 'Product - Demo migration using entity_with_forward_draft:node'
+migration_tags:
+  - Continuous
+  - Content
+  - Node
+migration_group: demo
+source:
+  plugin: csv
+  path: 'public://migrate_source/products.csv'
+  ids:
+    - id
+  delimiter: ","
+  enclosure: '"'
+  fields:
+    -
+      name: id
+      label: 'Unique row ID'
+    -
+      name: title
+      label: 'Product title'
+    -
+      name: sku
+      label: 'Product SKU'
+  track_changes: true
+process:
+  type:
+    plugin: default_value
+    default_value: product
+  title: title
+  field_product_sku: sku
+  moderation_state:
+    plugin: default_value
+    default_value: published
+  new_revision:
+    plugin: default_value
+    default_value: true
+  revision_default:
+    plugin: default_value
+    default_value: true
+  revision_log:
+    plugin: default_value
+    default_value: 'Updated by demo migration.'
+destination:
+  plugin: 'entity_with_forward_draft:node'
+  default_bundle: product
+  overwrite_properties:
+    - title
+    - field_product_sku
+    - new_revision
+    - revision_default
+    - revision_log
+  forward_revision_overwrite_properties:
+    - title
+    - field_product_sku
+migration_dependencies:
+  required: {  }

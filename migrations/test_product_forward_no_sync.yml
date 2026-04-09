@@ -1,0 +1,42 @@
+id: test_product_forward_no_sync
+label: 'Test product — entity_with_forward_draft with migration_sync false'
+migration_tags:
+  - Test
+source:
+  plugin: embedded_data
+  data_rows: []
+  ids:
+    id:
+      type: integer
+process:
+  type:
+    plugin: default_value
+    default_value: product
+  title: title
+  field_product_sku: sku
+  moderation_state:
+    plugin: default_value
+    default_value: published
+  new_revision:
+    plugin: default_value
+    default_value: true
+  revision_default:
+    plugin: default_value
+    default_value: true
+  revision_log:
+    plugin: default_value
+    default_value: 'Updated by migration.'
+destination:
+  plugin: 'entity_with_forward_draft:node'
+  default_bundle: product
+  migration_sync: false
+  overwrite_properties:
+    - title
+    - field_product_sku
+    - moderation_state
+    - new_revision
+    - revision_default
+    - revision_log
+  forward_revision_overwrite_properties:
+    - title
+    - field_product_sku

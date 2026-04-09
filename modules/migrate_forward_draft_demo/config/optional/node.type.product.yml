@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - migrate_forward_draft_demo
+  module:
+    - menu_ui
+third_party_settings:
+  menu_ui:
+    available_menus:
+      - main
+    parent: 'main:'
+name: Product
+type: product
+description: 'Demo type for migrate_forward_draft.'
+help: ''
+new_revision: true
+preview_mode: 1
+display_submitted: false

@@ -1,0 +1,8 @@
+<?php
+
+/**
+ * @file
+ * Demo scaffolding for Migrate Forward Draft.
+ */
+
+declare(strict_types=1);

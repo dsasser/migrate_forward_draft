@@ -1,0 +1,37 @@
+# Documents destination plugin settings used in migration YAML under "destination:".
+# Migrations store destination as unstructured mapping; this schema supports
+# documentation and optional validation extensions.
+
+migrate_forward_draft.destination.entity_with_forward_draft:
+  type: mapping
+  label: 'Entity with forward draft destination'
+  mapping:
+    default_bundle:
+      type: string
+      label: 'Default bundle'
+    translations:
+      type: boolean
+      label: 'Translations'
+    validate:
+      type: boolean
+      label: 'Validate before save'
+    overwrite_properties:
+      type: sequence
+      label: 'Overwrite properties on the default revision'
+      sequence:
+        type: string
+        label: 'Property name'
+    forward_revision_overwrite_properties:
+      type: sequence
+      label: 'Properties copied from the new default revision onto the replayed forward draft'
+      sequence:
+        type: string
+        label: 'Property name'
+    migration_sync:
+      type: boolean
+      label: 'Call setSyncing(TRUE) on the main migration entity save'
+      default: true
+    no_stub:
+      type: boolean
+      label: 'Disallow stubbing'
+      default: false
