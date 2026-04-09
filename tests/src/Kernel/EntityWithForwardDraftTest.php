@@ -153,7 +153,9 @@ class EntityWithForwardDraftTest extends MigrateTestBase {
   }
 
   /**
-   * entity:node may drop forward-draft editor data on rerun (environment-dependent).
+   * The entity:node destination may drop forward-draft editor notes on rerun.
+   *
+   * Environment-dependent.
    *
    * @covers ::import
    *
@@ -215,7 +217,7 @@ class EntityWithForwardDraftTest extends MigrateTestBase {
   }
 
   /**
-   * Forward draft is replayed and migration-owned fields are overlaid from default.
+   * Forward draft is replayed; migration-owned fields overlay from default.
    *
    * @covers ::import
    */
@@ -372,7 +374,7 @@ class EntityWithForwardDraftTest extends MigrateTestBase {
   }
 
   /**
-   * Empty forward_revision_overwrite_properties still replays the draft without overlays.
+   * Empty forward overwrite list still replays draft without default overlays.
    *
    * @covers ::import
    */
@@ -460,5 +462,3 @@ class EntityWithForwardDraftTest extends MigrateTestBase {
   }
 
 }
-
-
